@@ -22,18 +22,18 @@ const char* ssid = "0000";
 const char* pass = "00000000";
 
 // ---------------- Firebase ------------
-#define API_KEY "AIzaSyDeWSowkAp12M8No80M1u-zWbaIRYJBPZw"
-#define DATABASE_URL "https://smartenergymeter-b40f8-default-rtdb.asia-southeast1.firebasedatabase.app/"
-#define USER_EMAIL "sk.mohit.saini123@gmail.com"
-#define USER_PASSWORD "mohit1234"
+#define API_KEY " your firbase API KEY"
+#define DATABASE_URL "your Database url"
+#define USER_EMAIL "your email using firbase "
+#define USER_PASSWORD "email password"
 
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
 
 // ---------------- Telegram ------------
-const char* telegramBotToken = "8338264313:AAFXgf74pY_345luFADE5syWCgXQ-sV6Nkc";
-const char* telegramChatID   = "7636333943";
+const char* telegramBotToken = "your telegrambot token";
+const char* telegramChatID   = "your telegram chat id ";
 
 // ---------------- Relay Pins ---------
 #define RELAY1_PIN 26   // Main Relay
