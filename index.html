@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Smart Energy Meter ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -23,14 +23,20 @@
             --dark: #0f172a;
             --darker: #020617;
             --card-bg: #1e293b;
+            --card-hover: #2d3a4f;
             --border: #334155;
             --text: #f8fafc;
             --text-dim: #94a3b8;
             --sidebar-width: 280px;
             --header-height: 70px;
+            --safe-area: env(safe-area-inset-top, 0px);
             --gradient-1: linear-gradient(135deg, #3b82f6, #8b5cf6);
             --gradient-2: linear-gradient(135deg, #10b981, #34d399);
             --gradient-3: linear-gradient(135deg, #ef4444, #f87171);
+            --gradient-4: linear-gradient(135deg, #f59e0b, #fbbf24);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         body {
@@ -39,51 +45,54 @@
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* ===== हैम्बर्गर मेनू ===== */
+        /* ===== हैम्बर्गर मेनू (बड़ा और touch friendly) ===== */
         .menu-toggle {
             position: fixed;
-            top: 15px;
+            top: max(15px, var(--safe-area));
             left: 15px;
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             z-index: 1001;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .menu-toggle:hover {
-            background: var(--primary);
+        .menu-toggle:active {
+            transform: scale(0.95);
         }
 
         .menu-toggle span {
-            width: 25px;
+            width: 28px;
             height: 3px;
             background: var(--text);
             border-radius: 3px;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
+            transform: rotate(45deg) translate(8px, 8px);
         }
 
         .menu-toggle.active span:nth-child(2) {
             opacity: 0;
+            transform: translateX(-10px);
         }
 
         .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
+            transform: rotate(-45deg) translate(8px, -8px);
         }
 
         /* ===== साइडबार ओवरले ===== */
@@ -93,12 +102,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(3px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
             z-index: 999;
             display: none;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
         }
 
         .sidebar-overlay.active {
@@ -106,19 +115,19 @@
             opacity: 1;
         }
 
-        /* ===== साइडबार ===== */
+        /* ===== साइडबार (मोबाइल के लिए optimized) ===== */
         .sidebar {
             position: fixed;
             top: 0;
-            left: -300px;
-            width: var(--sidebar-width);
+            left: -320px;
+            width: min(320px, 85vw);
             height: 100vh;
-            background: var(--darker);
+            background: linear-gradient(145deg, var(--darker), #0a0f1a);
             border-right: 1px solid var(--border);
             z-index: 1000;
-            transition: left 0.3s ease;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
         }
@@ -128,28 +137,47 @@
         }
 
         .sidebar-header {
-            padding: 30px 20px;
+            padding: 40px 20px;
             text-align: center;
             border-bottom: 1px solid var(--border);
             background: linear-gradient(145deg, var(--darker), #0a0f1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .sidebar-logo {
-            font-size: 2.5rem;
+            font-size: 3rem;
             background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            animation: pulse 3s infinite;
         }
 
         .sidebar-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 700;
             color: var(--text);
         }
 
         .sidebar-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-dim);
             margin-top: 5px;
         }
@@ -163,11 +191,18 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 15px 25px;
+            padding: 18px 25px;
             color: var(--text-dim);
             transition: all 0.3s;
             cursor: pointer;
-            border-left: 3px solid transparent;
+            border-left: 4px solid transparent;
+            margin: 4px 0;
+            font-size: 1.1rem;
+        }
+
+        .menu-item:active {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(0.98);
         }
 
         .menu-item:hover {
@@ -180,50 +215,53 @@
             background: var(--gradient-1);
             color: white;
             border-left-color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .menu-item i {
-            font-size: 1.3rem;
-            width: 25px;
+            font-size: 1.5rem;
+            width: 30px;
         }
 
         .badge {
             background: var(--danger);
             color: white;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 50px;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             margin-left: auto;
+            font-weight: 600;
         }
 
-        /* ===== डिवाइस स्टेटस (सिर्फ STATUS दिखेगा, ID नहीं) ===== */
+        /* ===== डिवाइस स्टेटस ===== */
         .device-status {
             padding: 20px 25px;
             border-top: 1px solid var(--border);
             margin-top: auto;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
         }
 
         .status-dot {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             position: relative;
         }
 
         .status-dot.online {
             background: var(--secondary);
-            box-shadow: 0 0 20px var(--secondary);
+            box-shadow: 0 0 25px var(--secondary);
             animation: pulse 2s infinite;
         }
 
@@ -232,8 +270,8 @@
         }
 
         .status-text {
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .status-text.online {
@@ -244,75 +282,68 @@
             color: var(--text-dim);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* ===== डिवाइस एक्शन बटन ===== */
-        .device-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
         .device-action-btn {
-            flex: 1;
-            padding: 12px;
+            width: 100%;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.3s;
+            font-size: 1rem;
         }
 
         .device-action-btn.remove {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.15);
             color: var(--danger);
             border: 1px solid var(--danger);
         }
 
-        .device-action-btn.remove:hover {
+        .device-action-btn.remove:active {
             background: var(--danger);
             color: white;
+            transform: scale(0.98);
         }
 
-        /* ===== लॉगआउट बटन (साइडबार में नीचे) ===== */
+        /* ===== लॉगआउट बटन ===== */
         .logout-sidebar {
             padding: 20px 25px;
             border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .logout-sidebar-btn {
             width: 100%;
-            padding: 15px;
-            background: rgba(239, 68, 68, 0.1);
+            padding: 16px;
+            background: rgba(239, 68, 68, 0.15);
             color: var(--danger);
             border: 1px solid var(--danger);
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             transition: all 0.3s;
+            font-size: 1.1rem;
         }
 
-        .logout-sidebar-btn:hover {
+        .logout-sidebar-btn:active {
             background: var(--danger);
             color: white;
+            transform: scale(0.98);
         }
 
         /* ===== मुख्य कंटेंट ===== */
         .main-content {
-            padding: 20px;
-            padding-top: calc(var(--header-height) + 20px);
+            padding: 15px;
+            padding-top: calc(var(--header-height) + 15px);
+            padding-bottom: 20px;
             max-width: 1200px;
             margin: 0 auto;
             transition: margin-left 0.3s;
@@ -330,31 +361,33 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 15px 0 70px;
+            padding: 0 15px 0 80px;
             z-index: 99;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-md);
         }
 
         .header-status {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: var(--darker);
-            padding: 8px 15px;
-            border-radius: 30px;
+            padding: 10px 18px;
+            border-radius: 40px;
             border: 1px solid var(--border);
+            backdrop-filter: blur(5px);
         }
 
         .header-status-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
         }
 
         .header-status-dot.online {
             background: var(--secondary);
-            box-shadow: 0 0 10px var(--secondary);
+            box-shadow: 0 0 15px var(--secondary);
+            animation: pulse 2s infinite;
         }
 
         .header-status-dot.offline {
@@ -362,13 +395,14 @@
         }
 
         .header-status-text {
-            font-size: 0.85rem;
-            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: var(--gradient-1);
             border-radius: 50%;
             display: flex;
@@ -376,36 +410,69 @@
             justify-content: center;
             color: white;
             font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         /* ===== पेज टाइटल ===== */
         .page-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
-            padding: 0 10px;
+            padding: 0 5px;
+            position: relative;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 5px;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-1);
+            border-radius: 2px;
         }
 
         /* ===== कंटेंट सेक्शन ===== */
         .content-section {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .content-section.active {
             display: block;
         }
 
-        /* ===== कार्ड ===== */
+        /* ===== कार्ड (मोबाइल के लिए बड़े paddings) ===== */
         .card {
             background: var(--card-bg);
             padding: 20px;
-            border-radius: 20px;
+            border-radius: 24px;
             border: 1px solid var(--border);
-            margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:active {
+            transform: scale(0.99);
         }
 
         .card-header {
@@ -416,143 +483,203 @@
         }
 
         .card-header i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--primary);
-            background: rgba(59, 130, 246, 0.1);
-            padding: 10px;
-            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.15);
+            padding: 12px;
+            border-radius: 16px;
         }
 
         .card-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
         }
 
-        /* ===== मेट्रिक्स ग्रिड ===== */
+        /* ===== मेट्रिक्स ग्रिड (बड़े touch targets) ===== */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .metric-card {
             background: var(--card-bg);
-            padding: 15px;
-            border-radius: 15px;
+            padding: 16px 10px;
+            border-radius: 20px;
             border: 1px solid var(--border);
             text-align: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-card:active {
+            transform: scale(0.97);
+            background: var(--card-hover);
         }
 
         .metric-icon {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .metric-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-dim);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .metric-value {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .metric-unit {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-dim);
             margin-left: 3px;
+            font-weight: 500;
         }
 
         /* ===== एनर्जी कार्ड ===== */
         .energy-cost-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .energy-card, .cost-card {
-            background: var(--card-bg);
+            background: linear-gradient(145deg, var(--card-bg), #1a2a3a);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 20px;
             border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .energy-card:active, .cost-card:active {
+            transform: scale(0.98);
         }
 
         .energy-value {
             font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--primary);
+            font-weight: 800;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0 5px;
         }
 
         .cost-value {
             font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--secondary);
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0 5px;
         }
 
-        /* ===== रिले ग्रिड ===== */
+        .cost-value::before {
+            content: '₹';
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            margin-right: 5px;
+        }
+
+        /* ===== रिले ग्रिड (touch friendly) ===== */
         .relay-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 12px;
             margin: 20px 0;
         }
 
         .relay-card {
             background: var(--darker);
-            padding: 20px;
-            border-radius: 15px;
+            padding: 20px 12px;
+            border-radius: 20px;
             border: 1px solid var(--border);
             text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .relay-card:active {
+            transform: scale(0.97);
         }
 
         .relay-card.active {
             border-color: var(--secondary);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
         }
 
         .relay-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .relay-card.active .relay-icon {
+            color: var(--secondary);
         }
 
         .relay-name {
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
         }
 
         .relay-pin {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--text-dim);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .relay-toggle {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 14px;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .relay-toggle:active {
+            transform: scale(0.96);
         }
 
         .relay-toggle.on {
             background: var(--secondary);
             color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .relay-toggle.off {
             background: var(--danger);
             color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
-        /* ===== प्रोटेक्शन ग्रिड ===== */
+        /* ===== प्रोटेक्शन इनपुट ===== */
         .protection-grid {
             display: grid;
             gap: 15px;
@@ -560,29 +687,42 @@
 
         .protection-input {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: var(--darker);
             border: 2px solid var(--border);
-            border-radius: 10px;
+            border-radius: 16px;
             color: var(--text);
             font-size: 1rem;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
         }
 
-        /* ===== बटन ===== */
+        .protection-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ===== बटन (बड़े और touch friendly) ===== */
         .btn {
-            padding: 12px 20px;
+            padding: 16px 20px;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
+            border-radius: 16px;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            font-size: 1rem;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -603,20 +743,21 @@
         /* ===== चार्ट ===== */
         .charts-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 16px;
         }
 
         .chart-container {
             height: 250px;
-            margin: 20px 0;
+            margin: 10px 0;
+            position: relative;
         }
 
         /* ===== वायरिंग डायग्राम ===== */
         .wiring-diagram {
             background: linear-gradient(145deg, #1a1f2e, #0f1420);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 20px;
             border: 2px dashed var(--primary);
             margin: 20px 0;
         }
@@ -624,50 +765,90 @@
         .esp32-pins {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
 
         .pin-info {
             background: var(--card-bg);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 16px;
             text-align: center;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pin-info:active {
+            transform: scale(0.98);
         }
 
         .pin {
             font-weight: 700;
             color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
         }
 
         /* ===== अलर्ट ===== */
         .alert-item {
-            padding: 12px;
+            padding: 16px;
             border-left: 4px solid;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alert-item i {
+            font-size: 1.3rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* ===== नोटिफिकेशन ===== */
         .notification {
             position: fixed;
-            top: 80px;
-            right: 20px;
-            left: 20px;
+            top: max(80px, calc(var(--header-height) + 15px));
+            right: 15px;
+            left: 15px;
             max-width: 400px;
             margin: 0 auto;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border-radius: 20px;
             background: var(--card-bg);
             border-left: 4px solid var(--secondary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-lg);
             z-index: 10000;
-            animation: slideDown 0.3s;
+            animation: notificationSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        @keyframes slideDown {
+        .notification i {
+            font-size: 1.3rem;
+        }
+
+        @keyframes notificationSlide {
             from {
                 transform: translateY(-100%);
                 opacity: 0;
@@ -676,6 +857,123 @@
                 transform: translateY(0);
                 opacity: 1;
             }
+        }
+
+        /* ===== लॉगिन पेज (मोबाइल optimized) ===== */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 40px 25px;
+            border-radius: 32px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo i {
+            font-size: 4rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .auth-logo h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .auth-divider {
+            position: relative;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .auth-divider::before { left: 0; }
+        .auth-divider::after { right: 0; }
+
+        .auth-divider span {
+            background: var(--card-bg);
+            padding: 0 15px;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .auth-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .auth-link:active {
+            opacity: 0.7;
         }
 
         /* ===== रिस्पॉन्सिव ===== */
@@ -712,6 +1010,39 @@
             .esp32-pins {
                 grid-template-columns: repeat(4, 1fr);
             }
+            
+            .charts-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* ===== एनिमेशन ===== */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ===== स्क्रॉलबार ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* ===== टच ऑप्टिमाइजेशन ===== */
+        button, .menu-item, .relay-card, .metric-card, .device-action-btn {
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
@@ -766,14 +1097,13 @@
             </div>
         </div>
 
-        <!-- ===== डिवाइस स्टेटस (सिर्फ STATUS दिखेगा, ID नहीं) ===== -->
+        <!-- ===== डिवाइस स्टेटस ===== -->
         <div class="device-status" id="deviceStatusSection" style="display: none;">
             <div class="status-indicator">
                 <span class="status-dot offline" id="deviceStatusDot"></span>
                 <span class="status-text offline" id="deviceStatusText">Device Offline</span>
             </div>
             
-            <!-- ===== डिवाइस रिमूव बटन ===== -->
             <div class="device-actions">
                 <button class="device-action-btn remove" onclick="removeDevice()">
                     <i class="fas fa-trash-alt"></i> Remove Device
@@ -781,18 +1111,16 @@
             </div>
         </div>
 
-        <!-- ===== नो डिवाइस मैसेज ===== -->
         <div class="device-status" id="noDeviceMessage">
             <div class="status-indicator">
                 <span class="status-dot offline"></span>
                 <span class="status-text offline">No Device Connected</span>
             </div>
-            <p style="color: var(--text-dim); font-size: 0.9rem; text-align: center; margin-top: 10px;">
+            <p style="color: var(--text-dim); font-size: 0.95rem; text-align: center; margin-top: 15px;">
                 Register a device to start monitoring
             </p>
         </div>
 
-        <!-- ===== लॉगआउट बटन (साइडबार में नीचे) ===== -->
         <div class="logout-sidebar">
             <button class="logout-sidebar-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -802,7 +1130,6 @@
 
     <!-- ===== मुख्य कंटेंट ===== -->
     <div class="main-content">
-        <!-- ===== मोबाइल हेडर ===== -->
         <div class="mobile-header">
             <div class="header-status">
                 <span class="header-status-dot offline" id="mobileStatusDot"></span>
@@ -813,10 +1140,9 @@
             </div>
         </div>
 
-        <!-- ===== पेज टाइटल ===== -->
         <div class="page-title" id="pageTitle">Dashboard</div>
 
-        <!-- ===== डैशबोर्ड सेक्शन ===== -->
+        <!-- Dashboard Section -->
         <div id="dashboard-section" class="content-section active">
             <div class="metrics-grid">
                 <div class="metric-card">
@@ -850,17 +1176,21 @@
 
             <div class="charts-grid">
                 <div class="card">
-                    <canvas id="powerChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="powerChart"></canvas>
+                    </div>
                 </div>
                 <div class="card">
-                    <canvas id="distributionChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <div id="alertsList"></div>
         </div>
 
-        <!-- ===== डिवाइस मैनेजमेंट सेक्शन ===== -->
+        <!-- Device Management Section -->
         <div id="devices-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -883,7 +1213,7 @@
             </div>
         </div>
 
-        <!-- ===== रिले कॉन्फ़िगरेशन सेक्शन ===== -->
+        <!-- Relay Configuration Section -->
         <div id="relayConfig-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -892,7 +1222,7 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label style="color: var(--text-dim); display: block; margin-bottom: 8px;">Number of Relays:</label>
+                    <label style="color: var(--text-dim); display: block; margin-bottom: 10px;">Number of Relays:</label>
                     <input type="number" class="protection-input" id="relayCount" min="1" max="16" value="4" onchange="updateRelayPins()">
                 </div>
 
@@ -904,7 +1234,7 @@
             </div>
         </div>
 
-        <!-- ===== रिले कंट्रोल सेक्शन ===== -->
+        <!-- Relay Control Section -->
         <div id="relays-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -914,7 +1244,7 @@
 
                 <div class="relay-grid" id="relayControlGrid"></div>
 
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">
                     <button class="btn btn-success" onclick="setAllRelays(true)" style="flex: 1;">
                         <i class="fas fa-power-off"></i> All ON
                     </button>
@@ -925,7 +1255,7 @@
             </div>
         </div>
 
-        <!-- ===== प्रोटेक्शन सेक्शन ===== -->
+        <!-- Protection Section -->
         <div id="protection-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -958,7 +1288,7 @@
             </div>
         </div>
 
-        <!-- ===== वायरिंग गाइड सेक्शन ===== -->
+        <!-- Wiring Guide Section -->
         <div id="wiring-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -981,7 +1311,7 @@
             </div>
         </div>
 
-        <!-- ===== सेटिंग्स सेक्शन ===== -->
+        <!-- Settings Section -->
         <div id="settings-section" class="content-section">
             <div class="card">
                 <div class="card-header">
@@ -1001,52 +1331,65 @@
         </div>
     </div>
 
-    <!-- ===== लॉगिन पेज ===== -->
-    <div id="loginPage" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 2000;">
-        <div style="max-width: 400px; width: 100%; padding: 20px;">
-            <div class="card" style="text-align: center;">
-                <i class="fas fa-bolt" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
-                <h1 style="margin-bottom: 10px;">Smart Energy</h1>
-                <p style="color: var(--text-dim); margin-bottom: 30px;">Login to continue</p>
-
-                <input type="email" id="loginEmail" class="protection-input" placeholder="Email">
-                <input type="password" id="loginPassword" class="protection-input" placeholder="Password">
-
-                <button class="btn btn-primary" onclick="loginWithEmail()">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-
-                <button class="btn" onclick="loginWithGoogle()" style="background: white; color: #333; margin-top: 10px;">
-                    <i class="fab fa-google" style="color: #4285f4;"></i> Google Login
-                </button>
-
-                <p style="margin-top: 20px; color: var(--text-dim);">
-                    Don't have an account? 
-                    <a onclick="showRegister()" style="color: var(--primary); cursor: pointer;">Register</a>
-                </p>
+    <!-- Login Page -->
+    <div id="loginPage" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-bolt"></i>
+                <h2>Smart Energy</h2>
+                <p style="color: var(--text-dim); margin-top: 10px;">Login to your account</p>
             </div>
+
+            <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
+            <input type="password" id="loginPassword" class="auth-input" placeholder="Password">
+
+            <button class="btn btn-primary" onclick="loginWithEmail()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+            <button class="btn" onclick="loginWithGoogle()" style="background: white; color: #333;">
+                <i class="fab fa-google" style="color: #4285f4;"></i> Continue with Google
+            </button>
+
+            <p style="text-align: center; margin-top: 25px; color: var(--text-dim);">
+                Don't have an account? 
+                <span class="auth-link" onclick="showRegister()">Create Account</span>
+            </p>
         </div>
     </div>
 
-    <!-- ===== रजिस्टर पेज ===== -->
-    <div id="registerPage" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark); display: none; align-items: center; justify-content: center; z-index: 2000;">
-        <div style="max-width: 400px; width: 100%; padding: 20px;">
-            <div class="card" style="text-align: center;">
-                <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
-                <h1 style="margin-bottom: 30px;">Create Account</h1>
-
-                <input type="email" id="regEmail" class="protection-input" placeholder="Email">
-                <input type="password" id="regPassword" class="protection-input" placeholder="Password (min 6 characters)">
-
-                <button class="btn btn-primary" onclick="register()">
-                    <i class="fas fa-user-plus"></i> Register
-                </button>
-
-                <p style="margin-top: 20px; color: var(--text-dim);">
-                    Already have an account? 
-                    <a onclick="showLogin()" style="color: var(--primary); cursor: pointer;">Login</a>
-                </p>
+    <!-- Register Page -->
+    <div id="registerPage" class="auth-container" style="display: none;">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-user-plus"></i>
+                <h2>Create Account</h2>
+                <p style="color: var(--text-dim); margin-top: 10px;">Sign up to get started</p>
             </div>
+
+            <input type="email" id="regEmail" class="auth-input" placeholder="Email Address">
+            <input type="password" id="regPassword" class="auth-input" placeholder="Password (min 6 characters)">
+
+            <button class="btn btn-primary" onclick="register()">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+            <button class="btn" onclick="loginWithGoogle()" style="background: white; color: #333;">
+                <i class="fab fa-google" style="color: #4285f4;"></i> Sign up with Google
+            </button>
+
+            <p style="text-align: center; margin-top: 25px; color: var(--text-dim);">
+                Already have an account? 
+                <span class="auth-link" onclick="showLogin()">Login</span>
+            </p>
         </div>
     </div>
 
@@ -1121,7 +1464,6 @@
         function updateDeviceStatus(online) {
             deviceOnline = online;
             
-            // साइडबार स्टेटस
             const statusDot = document.getElementById('deviceStatusDot');
             const statusText = document.getElementById('deviceStatusText');
             
@@ -1154,18 +1496,15 @@
             }
 
             try {
-                // Remove device listener
                 if (deviceListener) {
                     deviceListener();
                 }
 
-                // Remove from Firebase
                 await remove(ref(db, `users/${currentUser.uid}/deviceId`));
                 await remove(ref(db, `devices/${currentDeviceId}/owner`));
 
                 currentDeviceId = null;
                 
-                // Update UI
                 document.getElementById('deviceStatusSection').style.display = 'none';
                 document.getElementById('noDeviceMessage').style.display = 'block';
                 document.getElementById('deviceBadge').style.display = 'inline';
@@ -1173,7 +1512,6 @@
                 
                 updateDeviceStatus(false);
                 
-                // Clear dashboard data
                 document.getElementById('voltage').innerText = '0';
                 document.getElementById('current').innerText = '0';
                 document.getElementById('power').innerText = '0';
@@ -1373,7 +1711,6 @@
                 return;
             }
 
-            // Validate MAC address
             const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
             if (!macRegex.test(deviceId)) {
                 showNotification('Invalid MAC address. Use format: AA:BB:CC:DD:EE:FF', 'error');
@@ -1381,7 +1718,6 @@
             }
 
             try {
-                // Check if device exists
                 const deviceRef = ref(db, `devices/${deviceId}`);
                 const snapshot = await get(deviceRef);
 
@@ -1393,7 +1729,6 @@
                     }
                 }
 
-                // Register device
                 await set(deviceRef, {
                     owner: currentUser.uid,
                     registeredAt: new Date().toISOString(),
@@ -1404,7 +1739,6 @@
 
                 currentDeviceId = deviceId;
                 
-                // Update UI
                 document.getElementById('deviceStatusSection').style.display = 'block';
                 document.getElementById('noDeviceMessage').style.display = 'none';
                 document.getElementById('deviceBadge').style.display = 'none';
@@ -1414,7 +1748,6 @@
                 
                 showNotification('Device registered successfully!', 'success');
                 
-                // Start monitoring
                 startDeviceMonitoring(deviceId);
                 
             } catch (error) {
@@ -1424,12 +1757,10 @@
 
         // ===== डिवाइस मॉनिटरिंग शुरू =====
         function startDeviceMonitoring(deviceId) {
-            // Clear previous listener
             if (deviceListener) {
                 deviceListener();
             }
 
-            // Listen for energy data
             const energyRef = ref(db, `devices/${deviceId}/EnergyMeter`);
             deviceListener = onValue(energyRef, (snapshot) => {
                 const data = snapshot.val();
@@ -1443,7 +1774,6 @@
                     document.getElementById('energy').innerText = data.energy?.toFixed(2) || '0';
                     document.getElementById('cost').innerText = data.cost?.toFixed(2) || '0';
                     
-                    // Update charts
                     if (charts.power) {
                         const chartData = charts.power.data.datasets[0].data;
                         chartData.shift();
@@ -1456,11 +1786,10 @@
                 updateDeviceStatus(false);
             });
 
-            // Set timeout for offline detection
             if (lastSeenTimer) clearTimeout(lastSeenTimer);
             lastSeenTimer = setTimeout(() => {
                 updateDeviceStatus(false);
-            }, 10000); // 10 seconds without data = offline
+            }, 10000);
         }
 
         // ===== लॉगिन फंक्शन =====
@@ -1538,7 +1867,6 @@
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('userAvatar').innerHTML = user.email ? user.email[0].toUpperCase() : 'U';
                 
-                // Check for registered device
                 const snapshot = await get(ref(db, `users/${user.uid}/deviceId`));
                 
                 if (snapshot.exists()) {
@@ -1565,7 +1893,6 @@
 
         // ===== इनिशियलाइज़ =====
         window.onload = function() {
-            // Load saved relay config
             const saved = localStorage.getItem('relayConfig');
             if (saved) {
                 relayConfig = JSON.parse(saved);
@@ -1576,7 +1903,6 @@
             updateRelayControls();
             updateWiringDiagram();
             
-            // Initialize charts
             const powerCtx = document.getElementById('powerChart').getContext('2d');
             charts.power = new Chart(powerCtx, {
                 type: 'line',
@@ -1618,7 +1944,6 @@
             });
         };
 
-        // रिसाइज़ हैंडलर
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 document.getElementById('sidebar').classList.remove('open');
